@@ -7,7 +7,14 @@ import java.util.ListIterator;
 
 public class ListA<E> implements List<E> {
 
-    //Создайте аналог списка БЕЗ использования других классов СТАНДАРТНОЙ БИБЛИОТЕКИ
+    private static final int DEFAULT_CAPACITY = 10;
+    private Object[] elements;
+    private int size;
+
+    public ListA() {
+        elements = new Object[DEFAULT_CAPACITY];
+        size = 0;
+    }
 
     /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////
@@ -16,22 +23,42 @@ public class ListA<E> implements List<E> {
     /////////////////////////////////////////////////////////////////////////
     @Override
     public String toString() {
-        return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(elements[i]);
+            if (i < size - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
     public boolean add(E e) {
-        return false;
+        if (size == elements.length) {
+            ensureCapacity();
+        }
+        elements[size++] = e;
+        return true;
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        checkIndex(index);
+        E removedElement = (E) elements[index];
+        int numMoved = size - index - 1;
+        if (numMoved > 0) {
+            System.arraycopy(elements, index + 1, elements, index, numMoved);
+        }
+        elements[--size] = null;
+        return removedElement;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -149,4 +176,14 @@ public class ListA<E> implements List<E> {
         return null;
     }
 
+    private void ensureCapacity() {
+        int newCapacity = elements.length * 2;
+        elements = java.util.Arrays.copyOf(elements, newCapacity);
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+    }
 }
